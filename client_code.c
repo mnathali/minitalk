@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+static int g_flag;
+
 int	ft_atoi(const char *str)
 {
 	size_t		i;
@@ -30,41 +32,55 @@ int	ft_atoi(const char *str)
 	return (j);
 }
 
-short	get_binary(short c, int pid, int n)
+short	get_binary(int c, int pid, int n)
 {
 	int j;
-//printf("n = %d\n", n);
+	
+	j = 0;
 	if (n > 0)
 		j = get_binary(c / 2, pid, n - 1);
 	if (j == -1)
-		return (-1);
+		return (j);
 	if (c % 2)
 		j = kill(pid, SIGUSR1);
 	else
 		j = kill(pid, SIGUSR2);
-	usleep(50);
-	//printf("n = %d\n", c % 2);
+	if (j == -1)
+		return (j);
+	pause();
 	return (j);
+}
+
+void handler(int n)
+{
+	if (n == SIGUSR2)
+		g_flag = 0;
+	else
+		g_flag = -1;
 }
 
 int main(int argc, char const *argv[])
 {
 	int	pid;
 	int	i;
-	short	c;
-	short	j;
+	int	c;
+	struct sigaction sa = {0};
 
+	sa.sa_handler = handler;
+
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	i = 0;
 	pid = ft_atoi(argv[1]);
 	while (argv[2][i] != 0)
 	{
 		c = (short)argv[2][i];
-		j = get_binary(c, pid, 30);
-		/*if (j == -1)
+		get_binary(c, pid, 30);
+		if (g_flag == -1);
 		{
-			printf("hello world\n");
+			write(1,"Not sended\n", 11);
 			break ;
-		}*/
+		}
 		i++;
 	}
 	return (0);

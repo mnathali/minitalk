@@ -4,55 +4,29 @@
 #include <signal.h>
 #include "ft_printf.h"
 
-char *letter;
+static const int g_num;
 
-int what_is_letter(char *str)
+void handler(int n, siginfo_t *inf, void *context)
 {
-	int i;
-	int c;
+	static int c;
+	static int i;
+	int pid;
 
-	i = 0;
-	c = 0;
-	while (str[i])
-	{
-		if (str[i] == '0')
-			c = 2 * c;
-		else
-			c = 2 * c + 1;
-		i++;
-	}
-	return (c);
-}
-
-void	*ft_calloc(size_t count, size_t size)
-{
-	char	*str;
-	size_t	i;
-
-	i = 0;
-	str = malloc(count * size);
-	if (!str)
-		return (0);
-	while (count * size - i != 0)
-	{
-		str[i] = 0;
-		i++;
-	}
-	return ((void *)str);
-}
-
-void handler(int n)
-{
-	int i;
-
-	i = 0;
-	while (letter[i])
-		i++;
+	pid = (int)inf->si_pid;
 	if (n == SIGUSR1)
-		letter[i] = '1';
+		c = 2 * c + 1;
 	else
-		letter[i] = '0';
-	//ft_printf("c1 = %s\n", letter);
+		c = 2 * c;
+	i++;
+	if (i == 31)
+	{
+		kill(pid, SIGUSR2);
+		ft_printf("%c", c);
+		i = 0;
+		c = 0;
+	}
+	else
+		kill(pid, SIGUSR1);
 }
 
 
@@ -61,31 +35,15 @@ int	main(int argc, char **argv)
 	int c;
 	struct sigaction sa = {0};
 
-	sa.sa_handler = handler;
+	sa.sa_flags = SA_SIGINFO | SA_RESTART;
+	sa.sa_sigaction = handler;
 
-	letter = ft_calloc(32, 1);
 	ft_printf("PID: %d\n", getpid());
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	while (1)
 	{
-		if (letter)
-		{
-			c = 0;
-			while (letter[c] != '\0')
-				c++;
-			if (c == 31)
-			{
-				c = what_is_letter(letter);
-				ft_printf("%c", c);
-				c = 0;
-				while (letter[c] != '\0')
-				{
-					letter[c] = 0;
-					c++;
-				}
-			}
-		}
+		pause();
 	}
 	return (0);
 }
