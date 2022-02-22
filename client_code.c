@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
+#define SZ 6
 
 static int g_flag;
 
@@ -75,8 +76,7 @@ int main(int argc, char const *argv[])
 	while (argv[2][i] != 0)
 	{
 		c = (short)argv[2][i];
-		get_binary(c, pid, 30);
-		if (g_flag == -1);
+		if (get_binary(c, pid, SZ) == -1)
 		{
 			write(1,"Not sended\n", 11);
 			break ;
