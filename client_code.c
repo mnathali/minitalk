@@ -1,9 +1,10 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <limits.h>
 #define SZ 6
 
-static int g_flag;
+static sig_atomic_t g_flag;
 
 int	ft_atoi(const char *str)
 {
@@ -36,8 +37,10 @@ int	ft_atoi(const char *str)
 short	get_binary(int c, int pid, int n)
 {
 	int j;
+	volatile int k;
 	
 	j = 0;
+	k = 0;
 	if (n > 0)
 		j = get_binary(c / 2, pid, n - 1);
 	if (j == -1)
@@ -48,16 +51,17 @@ short	get_binary(int c, int pid, int n)
 		j = kill(pid, SIGUSR2);
 	if (j == -1)
 		return (j);
-	pause();
+	while (g_flag == 0 && k != INT_MAX)
+		k++;
+	if (g_flag == 0)
+		j = -1;
+	g_flag = 0;
 	return (j);
 }
 
 void handler(int n)
 {
-	if (n == SIGUSR2)
-		g_flag = 0;
-	else
-		g_flag = -1;
+	g_flag = 1;
 }
 
 int main(int argc, char const *argv[])
@@ -73,6 +77,7 @@ int main(int argc, char const *argv[])
 	sigaction(SIGUSR2, &sa, NULL);
 	i = 0;
 	pid = ft_atoi(argv[1]);
+	g_flag = 0;
 	while (argv[2][i] != 0)
 	{
 		c = (short)argv[2][i];
