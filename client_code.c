@@ -1,8 +1,4 @@
-#include <signal.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <limits.h>
-#define SZ 6
+#include "minitalk.h"
 
 static sig_atomic_t g_flag;
 
@@ -49,8 +45,6 @@ short	get_binary(int c, int pid, int n)
 		j = kill(pid, SIGUSR1);
 	else
 		j = kill(pid, SIGUSR2);
-	if (j == -1)
-		return (j);
 	while (g_flag == 0 && k != INT_MAX)
 		k++;
 	if (g_flag == 0)
@@ -59,8 +53,9 @@ short	get_binary(int c, int pid, int n)
 	return (j);
 }
 
-void handler(int n)
+void handler_client(int n)
 {
+	(void)n;
 	g_flag = 1;
 }
 
@@ -68,19 +63,18 @@ int main(int argc, char const *argv[])
 {
 	int	pid;
 	int	i;
-	int	c;
+	unsigned char	c;
 	struct sigaction sa = {0};
 
-	sa.sa_handler = handler;
-
+	sa.sa_handler = handler_client;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	i = 0;
 	pid = ft_atoi(argv[1]);
-	g_flag = 0;
-	while (argv[2][i] != 0)
+	while (argc == 3 && argv[2][i] != 0)
 	{
-		c = (short)argv[2][i];
+		c = (unsigned char)argv[2][i];
+		g_flag = 0;
 		if (get_binary(c, pid, SZ) == -1)
 		{
 			write(1,"Not sended\n", 11);
