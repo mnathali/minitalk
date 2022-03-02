@@ -49,6 +49,8 @@ clean:
 fclean: clean
 	rm -rf $(NAME) $(NAME2)
 
+bonus: $(NAME) $(NAME2)
+
 re: fclean all
 
-.PHONY: all clean fclean re 
+.PHONY: all clean fclean re bonus

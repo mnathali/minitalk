@@ -18,7 +18,6 @@
 # include <stdlib.h>
 # define SZ 7
 
-void	handler(int n, siginfo_t *inf, void *context);
 void	ft_putnbr_fd(int n, int fd);
 
 #endif
