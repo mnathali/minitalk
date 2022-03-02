@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client_code.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mnathali <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/02 16:50:28 by mnathali          #+#    #+#             */
+/*   Updated: 2022/03/02 16:50:30 by mnathali         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minitalk.h"
 
-static sig_atomic_t g_flag;
+static sig_atomic_t	g_flag;
 
 int	ft_atoi(const char *str)
 {
@@ -32,9 +44,9 @@ int	ft_atoi(const char *str)
 
 short	get_binary(int c, int pid, int n)
 {
-	int j;
-	volatile int k;
-	
+	int				j;
+	volatile int	k;
+
 	j = 0;
 	k = 0;
 	if (n > 0)
@@ -53,19 +65,21 @@ short	get_binary(int c, int pid, int n)
 	return (j);
 }
 
-void handler_client(int n)
+void	handler_client(int n)
 {
 	(void)n;
 	g_flag = 1;
 }
 
-int main(int argc, char const *argv[])
+int	main(int argc, char const *argv[])
 {
-	int	pid;
-	int	i;
-	unsigned char	c;
-	struct sigaction sa = {0};
+	int					pid;
+	int					i;
+	unsigned char		c;
+	struct sigaction	sa;
 
+	sa.sa_flags = 0;
+	sa.sa_mask = 0;
 	sa.sa_handler = handler_client;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
@@ -77,7 +91,7 @@ int main(int argc, char const *argv[])
 		g_flag = 0;
 		if (get_binary(c, pid, SZ) == -1)
 		{
-			write(1,"Not sended\n", 11);
+			write(1, "Not sended\n", 11);
 			break ;
 		}
 		i++;
