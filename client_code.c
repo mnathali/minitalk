@@ -73,11 +73,13 @@ void	handler_client(int n)
 
 int	main(int argc, char const *argv[])
 {
-	int					pid;
-	int					i;
+	int			pid;
+	int			i;
 	unsigned char		c;
 	struct sigaction	sa;
 
+	if (argc < 2)
+		return (0);
 	sa.sa_flags = 0;
 	sa.sa_mask = 0;
 	sa.sa_handler = handler_client;
